@@ -61,11 +61,12 @@ int send_file(char filename[],int new_socket)
     int ackn = check_ack(new_socket);
     send(new_socket , filename , strlen(filename) , 0 );  // use sendto() and recvfrom() for DGRAM
     int ack2 = check_ack(new_socket);
-    while(fread(buffer,1024,1,ptr)==1)
+    int block;
+    while(block = fread(buffer,sizeof(char),1024,ptr)>0)
     {
-        char in[1024] = {0};
-        send(new_socket , buffer , strlen(buffer) , 0 );  // use sendto() and recvfrom() for DGRAM
+        send(new_socket , buffer , strlen(buffer) , block );  // use sendto() and recvfrom() for DGRAM
         int ack = check_ack(new_socket);
+        memset(buffer,0,1024);
     }
     char *final = "file transfer done";
     send(new_socket , final , strlen(final) , 0 );  // use sendto() and recvfrom() for DGRAM
